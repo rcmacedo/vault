@@ -20,28 +20,7 @@
     file: "/tmp/fetched_{{ vault_path | basename }}"
     name: secrets_in_file
 
-      #- name: Build combined content using akv_secret_key
-      #  ansible.builtin.set_fact:
-      #    vault_file_content: |
-      #      {% for entry in vault_definitions %}
-      #      {{ entry.akv_secret_key }}: {{ secrets_in_file[entry.vault_key] }}
-      #      {% endfor %}
-
-- name: Build combined content using akv_secret_key
-  ansible.builtin.set_fact:
-    vault_file_content: |
-      {% for entry in vault_definitions if entry.vault_key in secrets_in_file %}
-      {{ entry.akv_secret_key }}: {{ secrets_in_file[entry.vault_key] }}
-      {% endfor %}
-
-
-- name: Write new mapped secret file
-  ansible.builtin.copy:
-    dest: "/tmp/{{ vault_path | basename }}.mapped"
-    content: "{{ vault_file_content }}"
-    mode: '0600'
-
 - name: Debug generated content
   ansible.builtin.debug:
-    msg: "{{ vault_file_content }}"
+    var: "{{ secret_in_file }}"
 
