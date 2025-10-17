@@ -6,7 +6,7 @@
 
   vars:
     base_secret_path: "/opt/NEXT/Devops/ansible/files/secret"
-    servicekeys_file: "../vars/servicekeys.yaml"
+    servicekeys_file: "../vars/servicekeys.yml"
 
   tasks:
 
