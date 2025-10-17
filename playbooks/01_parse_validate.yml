@@ -1,0 +1,10 @@
+---
+- name: 01_parse_validate
+  hosts: control
+  gather_facts: false
+  tasks:
+    - name: Ler e validar planilha
+      ansible.builtin.include_role:
+        name: parse_sheet
+
+

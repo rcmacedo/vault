@@ -24,8 +24,6 @@
 - name: Write secrets to file in /tmp
   ansible.builtin.copy:
     content: "{{ vault_file_content }}"
-    dest: "/tmp/{{ vault_def.azure_vault }}-{{ vault_def.Environment }}"
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    dest: "/tmp/{{ akv_vault_name }}-{{ vault_def.environment }}"
     mode: '0600'
   no_log: true

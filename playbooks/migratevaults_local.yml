@@ -1,0 +1,58 @@
+---
+- name: Create Azure Key Vaults from on-prem secret vaults (Local Lab)
+  hosts: control
+  gather_facts: false
+
+  vars_files:
+    - ../vars/servicekeys.yml
+
+  vars:
+    base_secret_path: "/tmp/lab_secrets/opt/NEXT/Devops/ansible/files/secret"  # Caminho correto após extração
+    resource_group: "bradesco-lab-rg"
+    location: "eastus"
+    akv_vault_name: "bradesco-lab-vault"
+    azure_subscription_id: "{{ lookup('env', 'AZURE_SUBSCRIPTION_ID') | default('your-subscription-id') }}"
+    azure_tenant_id: "{{ lookup('env', 'AZURE_TENANT_ID') | default('your-tenant-id') }}"
+
+  tasks:
+    - name: Show execution environment
+      debug:
+        msg: |
+          Executando migração de vault em laboratório local
+          - AKV Vault: {{ akv_vault_name }}
+          - Resource Group: {{ resource_group }}
+          - Local secrets path: {{ base_secret_path }}
+          - Total de microserviços: {{ servicekeys | length }}
+
+    - name: Check if secrets directory exists
+      stat:
+        path: "{{ base_secret_path }}"
+      register: secrets_dir
+
+    - name: Create local secrets directory for testing
+      file:
+        path: "{{ base_secret_path }}"
+        state: directory
+        mode: '0755'
+      when: not secrets_dir.stat.exists
+
+    - name: Extract vault files for testing (if available)
+      unarchive:
+        src: "../files/aapvaults.tgz"
+        dest: "{{ base_secret_path }}"
+        remote_src: false
+      ignore_errors: true
+      when: secrets_dir.stat.exists
+
+    - name: Process first 3 microservice vault definitions (lab testing)
+      include_tasks: ../tasks/create_vault_and_upload.yml
+      loop: "{{ servicekeys[:3] }}"  # Limitar a 3 primeiros para teste
+      loop_control:
+        loop_var: vault_def
+
+    - name: Show summary
+      debug:
+        msg: |
+          Migração de laboratório concluída!
+          Processados {{ servicekeys[:3] | length }} microserviços de teste.
+          Arquivos temporários criados em /tmp/

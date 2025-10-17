@@ -1,0 +1,12 @@
+---
+- name: Checar variáveis obrigatórias
+  ansible.builtin.assert:
+    that:
+      - akv_vault_name | length > 0
+    fail_msg: "akv_vault_name não definido"
+
+- name: Verificar versão mínima (placeholder)
+  ansible.builtin.debug:
+    msg: "EE e coleções disponíveis"
+
+

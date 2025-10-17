@@ -1,0 +1,128 @@
+---
+- name: Validar caminho da planilha
+  ansible.builtin.assert:
+    that:
+      - sheet_path | length > 0
+      - sheet_path is defined
+    fail_msg: "sheet_path não definido ou vazio"
+
+- name: Verificar existência do arquivo
+  ansible.builtin.stat:
+    path: "{{ sheet_path }}"
+  register: sheet_file
+  delegate_to: localhost
+
+- name: Falhar se arquivo não existir
+  ansible.builtin.fail:
+    msg: "Arquivo de planilha não encontrado: {{ sheet_path }}"
+  when: not sheet_file.stat.exists
+
+- name: Determinar tipo de arquivo
+  ansible.builtin.set_fact:
+    file_extension: "{{ sheet_path | regex_replace('.*\\.', '') | lower }}"
+
+- name: Ler arquivo CSV
+  community.general.read_csv:
+    path: "{{ sheet_path }}"
+    delimiter: ","
+    skipinitialspace: true
+  register: csv_content
+  when: file_extension in ['csv']
+  delegate_to: localhost
+
+- name: Validar se CSV foi lido corretamente
+  ansible.builtin.assert:
+    that:
+      - csv_content.list | length > 0
+    fail_msg: "Planilha CSV está vazia ou não pôde ser lida"
+  when: file_extension in ['csv']
+
+- name: Filtrar linhas de comentário (que começam com #)
+  ansible.builtin.set_fact:
+    filtered_rows: >-
+      {{
+        csv_content.list | 
+        selectattr('origem', 'defined') |
+        rejectattr('origem', 'match', '^#.*') |
+        list
+      }}
+  when: file_extension in ['csv']
+
+- name: Validar colunas obrigatórias
+  ansible.builtin.assert:
+    that:
+      - item.origem is defined and item.origem | length > 0
+      - (item.destino is defined and item.destino | length > 0) or 
+        (item.prefixo is defined and item.prefixo | length > 0) or
+        (item.sufixo is defined and item.sufixo | length > 0)
+    fail_msg: "Linha inválida: {{ item }} - origem obrigatória e ao menos destino, prefixo ou sufixo devem estar definidos"
+    quiet: true
+  loop: "{{ filtered_rows }}"
+  when: 
+    - file_extension in ['csv']
+    - validation.required_columns is defined
+
+- name: Normalizar dados da planilha
+  ansible.builtin.set_fact:
+    normalized_secrets: >-
+      {{
+        filtered_rows |
+        map('combine', {
+          'origem': item.origem | trim,
+          'destino': item.destino | default('') | trim,
+          'prefixo': item.prefixo | default('') | trim,
+          'sufixo': item.sufixo | default('') | trim,
+          'tags': item.tags | default('{}') | from_json if (item.tags | default('')) != '' else {},
+          'content_type': item.content_type | default(defaults.content_type) | trim,
+          'enabled': (item.enabled | default('true')) | bool,
+          'row_number': loop.index
+        }) | list
+      }}
+  vars:
+    loop: "{{ range(1, filtered_rows | length + 1) | list }}"
+  when: file_extension in ['csv']
+
+- name: Aplicar validações adicionais
+  ansible.builtin.assert:
+    that:
+      - item.origem | regex_search('^[a-zA-Z0-9/_-]+$')
+      - item.content_type in ['text/plain', 'application/json', 'application/x-pkcs12', 'application/pkcs8', 'application/xml']
+    fail_msg: "Linha {{ item.row_number }}: formato inválido - origem deve conter apenas a-z, A-Z, 0-9, /, _, - e content_type deve ser válido"
+    quiet: true
+  loop: "{{ normalized_secrets }}"
+  when: 
+    - file_extension in ['csv']
+    - normalized_secrets is defined
+
+- name: Estatísticas do processamento
+  ansible.builtin.set_fact:
+    parsing_stats:
+      total_rows_found: "{{ csv_content.list | length }}"
+      comment_rows_filtered: "{{ csv_content.list | length - filtered_rows | length }}"
+      valid_rows_processed: "{{ normalized_secrets | length }}"
+      invalid_rows_skipped: "{{ filtered_rows | length - normalized_secrets | length }}"
+  when: file_extension in ['csv']
+
+- name: Exibir estatísticas do parsing
+  ansible.builtin.debug:
+    msg: |
+      Estatísticas do processamento da planilha:
+      - Total de linhas encontradas: {{ parsing_stats.total_rows_found }}
+      - Linhas de comentário filtradas: {{ parsing_stats.comment_rows_filtered }}
+      - Linhas válidas processadas: {{ parsing_stats.valid_rows_processed }}
+      - Linhas inválidas ignoradas: {{ parsing_stats.invalid_rows_skipped }}
+  when: 
+    - file_extension in ['csv']
+    - parsing_stats is defined
+
+- name: Definir resultado para próximas roles
+  ansible.builtin.set_fact:
+    parsed_secrets: "{{ normalized_secrets | default([]) }}"
+
+- name: Falhar se nenhum segredo válido foi encontrado
+  ansible.builtin.fail:
+    msg: "Nenhum segredo válido foi encontrado na planilha"
+  when: 
+    - parsed_secrets | length == 0
+
+

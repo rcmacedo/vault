@@ -1,0 +1,10 @@
+---
+- name: 00_precheck
+  hosts: control
+  gather_facts: false
+  tasks:
+    - name: Validar ambiente e acesso ao AKV
+      ansible.builtin.include_role:
+        name: validate_input
+
+
