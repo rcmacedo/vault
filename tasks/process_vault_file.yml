@@ -22,5 +22,5 @@
 
 - name: Debug generated content
   ansible.builtin.debug:
-    var: secret_in_file
+    var: secrets_in_file
 
