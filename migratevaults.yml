@@ -1,0 +1,20 @@
+---
+- name: Create Azure Key Vaults from on-prem secret vaults
+  hosts: 192.168.124.100
+  gather_facts: false
+
+  vars_files:
+    - ../vars/servicekeys.yml
+
+  vars:
+    base_secret_path: "/opt/NEXT/Devops/ansible/files/secret"
+    resource_group: "myResourceGroup"   # Adjust to your Azure RG
+    location: "eastus"                  # Adjust to your region
+
+  tasks:
+
+    - name: Process each microservice vault definition
+      ansible.builtin.include_tasks: ../tasks/create_vault_and_upload.yml
+      loop: "{{ servicekeys }}"
+      loop_control:
+        loop_var: vault_def
