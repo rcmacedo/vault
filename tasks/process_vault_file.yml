@@ -27,11 +27,11 @@
       {{ entry.akv_secret_key }}: {{ secrets_in_file[entry.vault_key] }}
       {% endfor %}
 
-- name: Write new mapped secret file
-  ansible.builtin.copy:
-    dest: "/tmp/{{ vault_path | basename }}.mapped"
-    content: "{{ vault_file_content }}"
-    mode: '0600'
+      #- name: Write new mapped secret file
+      #  ansible.builtin.copy:
+      #    dest: "/tmp/{{ vault_path | basename }}.mapped"
+      #    content: "{{ vault_file_content }}"
+      #    mode: '0600'
 
 - name: Debug generated content
   ansible.builtin.debug:
