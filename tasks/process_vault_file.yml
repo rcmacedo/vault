@@ -43,10 +43,10 @@
     msg: "{{ new_secret_content }}"
 
 - name: Upload each secret to Azure Key Vault
-  connection: local
   azure.azcollection.azure_rm_keyvaultsecret:
     secret_name: "{{ item.key }}"
     secret_value: "{{ item.value }}"
     keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net/"
     state: present
   loop: "{{ mapped_secrets | dict2items }}"
+  delegate_to: localhost
