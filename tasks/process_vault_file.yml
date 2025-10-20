@@ -50,3 +50,5 @@
     state: present
   loop: "{{ mapped_secrets | dict2items }}"
   delegate_to: localhost
+  loop_control:
+    pause: 2
