@@ -1,6 +1,3 @@
----
-# process_vault_file.yml
-
 - name: Filter vault definitions for current vault_path
   ansible.builtin.set_fact:
     vault_definitions: "{{ defs.servicekeys | selectattr('vault_path', 'equalto', vault_path) | list }}"
@@ -20,35 +17,15 @@
     file: "/tmp/fetched_{{ vault_path | basename }}"
     name: secrets_in_file
 
-- name: Build mapped secrets dict (loop + combine)
-  vars:
-    # initial empty dict
-    mapped_secrets: {}
-  set_fact:
-    mapped_secrets: "{{ mapped_secrets | default({}) | combine( { (entry.akv_secret_key): ( secrets_in_file.get(entry.vault_key | trim(':') ) | default('MISSING_SECRET') ) } ) }}"
+- name: Upload each secret to Azure Key Vault (memory-efficient)
+  azure.azcollection.azure_rm_keyvaultsecret:
+    secret_name: "{{ entry.akv_secret_key }}"
+    #secret_value: "{{ secrets_in_file.get(entry.vault_key | trim(':')) | default('MISSING_SECRET') }}"
+    secret_value: "{{ secrets_in_file[entry.vault_key] }}"
+    keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net/"
+    state: present
   loop: "{{ vault_definitions }}"
   loop_control:
     loop_var: entry
-
-- name: Debug mapped_secrets dict
-  ansible.builtin.debug:
-    var: mapped_secrets
-
-- name: Create YAML content from mapped_secrets
-  ansible.builtin.set_fact:
-    new_secret_content: "{{ mapped_secrets | to_nice_yaml }}"
-
-- name: Debug new_secret_content
-  ansible.builtin.debug:
-    msg: "{{ new_secret_content }}"
-
-- name: Upload each secret to Azure Key Vault
-  azure.azcollection.azure_rm_keyvaultsecret:
-    secret_name: "{{ item.key }}"
-    secret_value: "{{ item.value }}"
-    keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net/"
-    state: present
-  loop: "{{ mapped_secrets | dict2items }}"
-  delegate_to: localhost
-  loop_control:
     pause: 2
+  delegate_to: localhost
