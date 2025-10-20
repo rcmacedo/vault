@@ -477,15 +477,6 @@ servicekeys:
     environment: tu
     vault_path: next-data-migration/secret_tu.yaml
 
-  - microservice: next-data-migration
-    secret_type: application_secret
-    vault_key: B_SQLDB_CONTINGENCY_PASSWORD
-    akv_secret_key: >-
-      XXX-SQLDB-CONTINGENCY-SECRET [MS next-data-migration faz conexao com varios
-      banco de dados usando um unico user/pwd avaliar como ser√° migrado]
-    environment: tu
-    vault_path: next-data-migration/secret_tu.yaml
-
   - microservice: next-derivation-engine
     secret_type: application_secret
     vault_key: B_DB_PASSWORD
