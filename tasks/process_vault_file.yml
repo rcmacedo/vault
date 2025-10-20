@@ -20,14 +20,25 @@
     file: "/tmp/fetched_{{ vault_path | basename }}"
     name: secrets_in_file
 
-- name: Build new secret content using akv_secret_key
-  ansible.builtin.set_fact:
-    new_secret_content: |
-      {% for entry in vault_definitions %}
-      {{ entry.akv_secret_key }}: {{ secrets_in_file[entry.vault_key.rstrip(:)] }}
-      {% endfor %}
+- name: Build mapped secrets dict (loop + combine)
+  vars:
+    # initial empty dict
+    mapped_secrets: {}
+  set_fact:
+    mapped_secrets: "{{ mapped_secrets | default({}) | combine( { (entry.akv_secret_key): ( secrets_in_file.get(entry.vault_key | trim(':') ) | default('MISSING_SECRET') ) } ) }}"
+  loop: "{{ vault_definitions }}"
+  loop_control:
+    loop_var: entry
 
-- name: Debug generated content
+- name: Debug mapped_secrets dict
+  ansible.builtin.debug:
+    var: mapped_secrets
+
+- name: Create YAML content from mapped_secrets
+  ansible.builtin.set_fact:
+    new_secret_content: "{{ mapped_secrets | to_nice_yaml(line_width=0) }}"
+
+- name: Debug new_secret_content
   ansible.builtin.debug:
     msg: "{{ new_secret_content }}"
 
