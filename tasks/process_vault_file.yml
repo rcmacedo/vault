@@ -44,8 +44,8 @@
 
 - name: Upload each secret to Azure Key Vault
   azure.azcollection.azure_rm_keyvaultsecret:
-    name: "{{ item.key }}"
-    value: "{{ item.value }}"
+    secret_name: "{{ item.key }}"
+    secret_value: "{{ item.value }}"
     keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net/"
     state: present
   loop: "{{ mapped_secrets | dict2items }}"
