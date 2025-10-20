@@ -1,0 +1,59 @@
+---
+- name: 02_migrate | Ler e testar valores do vault remoto
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    remote_host: "192.168.122.103"
+    vault_remote_user: "root"
+    remote_vault_dir: "/opt/NEXT/Devops/ansible/files/secret"
+  tasks:
+    - name: Definir alvo dinâmico para o host remoto
+      add_host:
+        name: "{{ remote_host }}"
+        ansible_user: "{{ vault_remote_user }}"
+        ansible_host: "{{ remote_host }}"
+
+    - name: Coletar lista de arquivos de segredo no host remoto
+      delegate_to: "{{ remote_host }}"
+      become: false
+      shell: |
+        shopt -s nullglob
+        for f in {{ remote_vault_dir }}/*; do
+          [ -f "$f" ] && echo "$f"
+        done
+      args:
+        executable: /bin/bash
+      register: secret_files
+
+    - name: Mostrar arquivos encontrados
+      debug:
+        var: secret_files.stdout_lines
+
+    - name: Ler conteúdo dos segredos para teste
+      delegate_to: "{{ remote_host }}"
+      become: false
+      shell: |
+        set -euo pipefail
+        for f in {{ remote_vault_dir }}/*; do
+          [ -f "$f" ] || continue
+          bn=$(basename "$f")
+          printf "==== %s ====\n" "$bn"
+          cat "$f"
+          printf "\n"
+        done
+      args:
+        executable: /bin/bash
+      register: secrets_dump_raw
+
+    - name: Exibir valores lidos (apenas para teste)
+      debug:
+        msg: "{{ secrets_dump_raw.stdout }}"
+
+    - name: Aviso de segurança
+      debug:
+        msg: >-
+          ATENCAO: Esta execução exibe segredos em claro apenas para fins de
+          teste. Remover esta etapa antes de produção.
+
+

@@ -7,7 +7,7 @@
     - ../vars/servicekeys.yml
 
   vars:
-    base_secret_path: "/tmp/lab_secrets/opt/NEXT/Devops/ansible/files/secret"  # Caminho correto após extração
+    base_secret_path: "/opt/NEXT/Devops/ansible/files/secret"  # Caminho correto após extração
     resource_group: "bradesco-lab-rg"
     location: "eastus"
     akv_vault_name: "bradesco-lab-vault"
