@@ -27,5 +27,5 @@
   loop: "{{ vault_definitions }}"
   loop_control:
     loop_var: entry
-    pause: 2
+    pause: 1
   delegate_to: localhost
