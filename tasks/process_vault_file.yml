@@ -41,3 +41,12 @@
 - name: Debug new_secret_content
   ansible.builtin.debug:
     msg: "{{ new_secret_content }}"
+
+- name: Upload each secret to Azure Key Vault
+  azure.azcollection.azure_rm_keyvaultsecret:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net/"
+    state: present
+  loop: "{{ mapped_secrets | dict2items }}"
+
