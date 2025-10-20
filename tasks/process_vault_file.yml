@@ -36,7 +36,7 @@
 
 - name: Create YAML content from mapped_secrets
   ansible.builtin.set_fact:
-    new_secret_content: "{{ mapped_secrets | to_nice_yaml(line_width=0) }}"
+    new_secret_content: "{{ mapped_secrets | to_nice_yaml }}"
 
 - name: Debug new_secret_content
   ansible.builtin.debug:
