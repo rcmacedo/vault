@@ -15,15 +15,19 @@
     dest: "/tmp/fetched_{{ vault_path | basename }}"
     flat: yes
 
-- name: Fix double colons in vault file
-  ansible.builtin.shell: "sed -i 's/:$//' {{ full_secret_path }}"
-
 - name: Include secret vars from fetched vault
   ansible.builtin.include_vars:
     file: "/tmp/fetched_{{ vault_path | basename }}"
     name: secrets_in_file
 
+- name: Build new secret content using akv_secret_key
+  ansible.builtin.set_fact:
+    new_secret_content: |
+      {% for entry in vault_definitions %}
+      {{ entry.akv_secret_key }}: {{ secrets_in_file[entry.vault_key.rstrip(:)] }}
+      {% endfor %}
+
 - name: Debug generated content
   ansible.builtin.debug:
-    var: secrets_in_file
+    msg: "{{ new_secret_content }}"
 
