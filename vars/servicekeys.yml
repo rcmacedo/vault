@@ -218,13 +218,6 @@ servicekeys:
     environment: tu
     vault_path: next-cashback/secret_tu.yaml
 
-  - microservice: next-cashback
-    secret_type: application_secret
-    vault_key: B_BANKING_ACCESS_TOKEN_MKTP
-    akv_secret_key: xxxNAO-PRECISA-MIGRAR-SE-NAO-USAR-VERIFICAR-CASHBACK
-    environment: tu
-    vault_path: next-cashback/secret_tu.yaml
-
   - microservice: next-central-core
     secret_type: application_secret
     vault_key: B_REDIS_PASSWORD
