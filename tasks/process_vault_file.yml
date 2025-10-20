@@ -41,4 +41,3 @@
 - name: Debug new_secret_content
   ansible.builtin.debug:
     msg: "{{ new_secret_content }}"
-

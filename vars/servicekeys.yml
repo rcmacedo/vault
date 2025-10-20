@@ -703,15 +703,6 @@ servicekeys:
     environment: tu
     vault_path: next-message-router/secret_tu.yaml
 
-  - microservice: next-message-router
-    secret_type: application_secret
-    vault_key: B_DB_PASSWORD
-    akv_secret_key: >-
-      XXX-AKV-DB-SECRET [MSs next-message-router e next-organization nao utilizam
-      DB, apesar de secret existir | demais analisar]
-    environment: tu
-    vault_path: next-message-router/secret_tu.yaml
-
   - microservice: next-mgm
     secret_type: application_secret
     vault_key: B_DB_PASSWORD
@@ -810,15 +801,6 @@ servicekeys:
     environment: tu
     vault_path: next-offboarding/secret_tu.yaml
 
-  - microservice: next-organization
-    secret_type: application_secret
-    vault_key: B_DB_PASSWORD
-    akv_secret_key: >-
-      XXX-AKV-DB-SECRET [MSs next-message-router e next-organization nao utilizam
-      DB, apesar de secret existir | demais analisar]
-    environment: tu
-    vault_path: next-organization/secret_tu.yaml
-
   - microservice: next-parameters
     secret_type: application_secret
     vault_key: B_DB_PASSWORD
@@ -867,15 +849,6 @@ servicekeys:
     akv_secret_key: AKV-SECRET-KEY-DB-NEXTD000-NEXTBANK
     environment: tu
     vault_path: next-payment/secret_tu.yaml
-
-  - microservice: next-paz
-    secret_type: application_secret
-    vault_key: B_DB_PASSWORD
-    akv_secret_key: >-
-      XXX-AKV-DB-SECRET [MSs next-message-router e next-organization nao utilizam
-      DB, apesar de secret existir | demais analisar]
-    environment: tu
-    vault_path: next-paz/secret_tu.yaml
 
   - microservice: next-personal-identity-check
     secret_type: application_secret
