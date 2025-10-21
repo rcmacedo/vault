@@ -1512,4 +1512,3 @@ servicekeys:
     akv_secret_key: AKV-SECRET-KEY-SALESFORCE-API-KEY
     environment: tu
     vault_path: shop-srv-security/secret_tu.yaml
-
