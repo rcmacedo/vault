@@ -16,6 +16,7 @@
   ansible.builtin.include_vars:
     file: "/tmp/fetched_{{ vault_path | basename }}"
     name: secrets_in_file
+  no_log: false
 
 - name: Upload each secret to Azure Key Vault (memory-efficient)
   azure.azcollection.azure_rm_keyvaultsecret:
