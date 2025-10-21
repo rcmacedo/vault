@@ -20,7 +20,6 @@
 - name: Upload each secret to Azure Key Vault (memory-efficient)
   azure.azcollection.azure_rm_keyvaultsecret:
     secret_name: "{{ entry.akv_secret_key }}"
-    #secret_value: "{{ secrets_in_file.get(entry.vault_key | trim(':')) | default('MISSING_SECRET') }}"
     secret_value: "{{ secrets_in_file[entry.vault_key] }}"
     keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net/"
     state: present
