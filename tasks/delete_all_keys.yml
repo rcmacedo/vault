@@ -17,7 +17,7 @@
     keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net"
     state: absent
     purge_if_need: true
-  loop: "{{ akv_secrets_info.keys }}"
+  loop: "{{ akv_secrets_info.secrets }}"
   loop_control:
     label: "{{ item.attributes.name }}"
   delegate_to: localhost
