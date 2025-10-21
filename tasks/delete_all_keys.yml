@@ -11,15 +11,17 @@
   delegate_to: localhost
   tags: delete_all_secrets
 
+- name: Extract secret names from sid
+  set_fact:
+    akv_secret_names: "{{ vault_secrets.secrets | map('regex_replace', '.*/secrets/([^/]+)/.*', '\\1') | list }}"
+
 - name: Remover todas as keys do Azure Key Vault
   azure.azcollection.azure_rm_keyvaultsecret:
-    secret_name: "{{ item.name }}"
+    secret_name: "{{ item }}"
     keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net"
     state: absent
     purge_if_need: true
-  loop: "{{ vault_secrets.secrets }}"
-  loop_control:
-    label: "{{ item.name }}"
+  loop: "{{ akv_secret_names }}"
   delegate_to: localhost
   tags: delete_all_secrets
-  when: akv_secrets_info.secrets is defined and akv_secrets_info.secrets | length > 0
+  when: vault_secrets.secrets is defined and vault_secrets.secrets | length > 0
