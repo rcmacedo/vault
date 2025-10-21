@@ -696,10 +696,24 @@ servicekeys:
 
   - microservice: next-mgm
     secret_type: application_secret
+    vault_key: B_DB_PASSWORD
+    akv_secret_key: AKV-SECRET-KEY-DB-TESTE
+    environment: tu
+    vault_path: next-mgm/secret_ti.yaml
+
+  - microservice: next-mgm
+    secret_type: application_secret
     vault_key: B_MQ_PASSWORD
     akv_secret_key: AKV-SECRET-KEY-MQ-NEXT00-USRZ7XT
     environment: tu
     vault_path: next-mgm/secret_tu.yaml
+
+  - microservice: next-mgm
+    secret_type: application_secret
+    vault_key: B_MQ_PASSWORD
+    akv_secret_key: AKV-SECRET-KEY-MQ-TESTE
+    environment: tu
+    vault_path: next-mgm/secret_ti.yaml
 
   - microservice: next-mobiletopup
     secret_type: application_secret
