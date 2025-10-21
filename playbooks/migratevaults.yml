@@ -1,6 +1,6 @@
 ---
 - name: Map vault_key → akv_secret_key and build new secret file content
-  hosts: 192.168.124.100
+  hosts: 192.168.124.103
   gather_facts: false
   become: false
 
