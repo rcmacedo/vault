@@ -16,7 +16,6 @@
     name: "{{ item.attributes.name }}"
     vault_uri: "https://{{ azure_vault_name }}.vault.azure.net"
     state: absent
-    purge: true
   loop: "{{ akv_keys_info.keys }}"
   loop_control:
     label: "{{ item.attributes.name }}"
