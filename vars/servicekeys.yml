@@ -5,7 +5,7 @@ servicekeys:
     secret_type: application_secret
     vault_key: B_COR2CAI_TRUSTSTORE_PASSWORD
     akv_secret_key: AKV-SECRET-KEY-COR2CAI-TRUSTSTORE-PASSWORD
-    environment: tu
+    environment: ta
     vault_path: next-access-control/secret_tu.yaml
 
   - microservice: next-access-control
