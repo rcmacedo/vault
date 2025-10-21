@@ -1,6 +1,6 @@
 - name: Listar todas as keys do Azure Key Vault
   azure.azcollection.azure_rm_keyvaultkey_info:
-    vault_uri: "https://{{ azure_vault_name }}.vault.azure.net/"
+    keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net/"
   register: akv_keys_info
   delegate_to: localhost
   tags: delete_all_keys
@@ -15,7 +15,7 @@
   when: akv_keys_info.keys is defined and akv_keys_info.keys | length > 0
   azure.azcollection.azure_rm_keyvaultkey:
     name: "{{ item.attributes.name }}"
-    vault_uri: "https://{{ azure_vault_name }}.vault.azure.net/"
+    keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net/"
     state: absent
     purge: true
   loop: "{{ akv_keys_info.keys }}"
