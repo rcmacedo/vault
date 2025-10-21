@@ -1,4 +1,3 @@
----
 - name: Listar todas as keys do Azure Key Vault
   azure.azcollection.azure_rm_keyvaultkey_info:
     keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net/"
