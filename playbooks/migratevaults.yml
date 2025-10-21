@@ -1,4 +1,4 @@
----
+snf instal ansib---
 - name: Map vault_key → akv_secret_key and build new secret file content
   hosts: 192.168.124.100
   gather_facts: false
@@ -7,6 +7,7 @@
   vars:
     base_secret_path: "/opt/NEXT/Devops/ansible/files/secret"
     servicekeys_file: "../vars/servicekeys.yml"
+    ambiente: "tu"
 
   tasks:
 
@@ -15,9 +16,9 @@
         file: "{{ servicekeys_file }}"
         name: defs
 
-    - name: Get unique vault file paths
+    - name: Get unique vault file paths by environment
       ansible.builtin.set_fact:
-        vault_paths: "{{ defs.servicekeys | map(attribute='vault_path') | unique }}"
+        vault_paths: "{{ defs.servicekeys | map(attribute='vault_path') | unique | selectattr('environment', 'equalto', ambiente) }}"
 
     - name: Process each vault file
       ansible.builtin.include_tasks: ../tasks/process_vault_file.yml
