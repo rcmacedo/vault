@@ -14,6 +14,7 @@
 - name: Extract secret names from sid
   set_fact:
     akv_secret_names: "{{ vault_secrets.secrets | map('regex_replace', '.*/secrets/([^/]+)/.*', '\\1') | list }}"
+  tags: delete_all_secrets
 
 - name: Remover todas as keys do Azure Key Vault
   azure.azcollection.azure_rm_keyvaultsecret:
