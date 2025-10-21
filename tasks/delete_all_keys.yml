@@ -1,6 +1,6 @@
 - name: Listar todas as keys do Azure Key Vault
   azure.azcollection.azure_rm_keyvaultkey_info:
-    keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net/"
+    vault_uri: "https://{{ azure_vault_name }}.vault.azure.net"
   register: akv_keys_info
   delegate_to: localhost
   tags: delete_all_keys
@@ -8,14 +8,13 @@
 - name: List akv_keys_info
   ansible.builtin.debug:
     var: akv_keys_info
-  tags: delete_all_keys
   delegate_to: localhost
+  tags: delete_all_keys
 
 - name: Remover todas as keys do Azure Key Vault
-  when: akv_keys_info.keys is defined and akv_keys_info.keys | length > 0
   azure.azcollection.azure_rm_keyvaultkey:
     name: "{{ item.attributes.name }}"
-    keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net/"
+    vault_uri: "https://{{ azure_vault_name }}.vault.azure.net"
     state: absent
     purge: true
   loop: "{{ akv_keys_info.keys }}"
@@ -23,3 +22,4 @@
     label: "{{ item.attributes.name }}"
   delegate_to: localhost
   tags: delete_all_keys
+  when: akv_keys_info.keys is defined and akv_keys_info.keys | length > 0
