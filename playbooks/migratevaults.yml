@@ -29,3 +29,4 @@
     - name: Delete all keys in Azure Key Vault
       ansible.builtin.include_tasks: ../tasks/delete_all_keys.yml
       tags: delete_all_secrets
+      when: "'delete_all_secrets' in ansible_run_tags"
