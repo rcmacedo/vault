@@ -1,25 +1,25 @@
 - name: Listar todas as keys do Azure Key Vault
   azure.azcollection.azure_rm_keyvaultsecret_info:
     vault_uri: "https://{{ azure_vault_name }}.vault.azure.net"
-  register: akv_secrets_info
+  register: vault_secrets
   delegate_to: localhost
   tags: delete_all_secrets
 
 - name: List akv_keys_info
   ansible.builtin.debug:
-    var: akv_secrets_info
+    var: vault_secrets
   delegate_to: localhost
   tags: delete_all_secrets
 
 - name: Remover todas as keys do Azure Key Vault
   azure.azcollection.azure_rm_keyvaultsecret:
-    secret_name: "{{ item.attributes.name }}"
+    secret_name: "{{ item.name }}"
     keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net"
     state: absent
     purge_if_need: true
-  loop: "{{ akv_secrets_info.secrets }}"
+  loop: "{{ vault_secrets.secrets }}"
   loop_control:
-    label: "{{ item.attributes.name }}"
+    label: "{{ item.name }}"
   delegate_to: localhost
   tags: delete_all_secrets
   when: akv_secrets_info.secrets is defined and akv_secrets_info.secrets | length > 0
