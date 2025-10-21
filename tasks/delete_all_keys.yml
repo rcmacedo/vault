@@ -9,6 +9,7 @@
   ansible.builtin.debug:
     var: akv_keys_info
   tags: delete_all_keys
+  delegate_to: localhost
 
 - name: Remover todas as keys do Azure Key Vault
   when: akv_keys_info.keys is defined and akv_keys_info.keys | length > 0
