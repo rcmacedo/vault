@@ -1,59 +1,41 @@
 ---
-- name: 02_migrate | Ler e testar valores do vault remoto
-  hosts: localhost
-  connection: local
+- name: 02_migrate | Carregar servicekeys e ler vaults remotos como JSON
+  hosts: aapexec
   gather_facts: false
   vars:
-    remote_host: "192.168.122.103"
-    vault_remote_user: "root"
     remote_vault_dir: "/opt/NEXT/Devops/ansible/files/secret"
   tasks:
-    - name: Definir alvo dinâmico para o host remoto
-      add_host:
-        name: "{{ remote_host }}"
-        ansible_user: "{{ vault_remote_user }}"
-        ansible_host: "{{ remote_host }}"
+    - name: Carregar arquivo de servicekeys do projeto
+      ansible.builtin.include_vars:
+        file: ../vars/servicekeys.yml
+        name: servicekeys_map
 
-    - name: Coletar lista de arquivos de segredo no host remoto
-      delegate_to: "{{ remote_host }}"
-      become: false
-      shell: |
-        shopt -s nullglob
-        for f in {{ remote_vault_dir }}/*; do
-          [ -f "$f" ] && echo "$f"
-        done
-      args:
-        executable: /bin/bash
-      register: secret_files
+    - name: Armazenar servicekeys em JSON
+      ansible.builtin.set_fact:
+        servicekeys_json: "{{ servicekeys_map | to_json }}"
 
-    - name: Mostrar arquivos encontrados
-      debug:
-        var: secret_files.stdout_lines
+    - name: Derivar lista de caminhos de vault únicos
+      ansible.builtin.set_fact:
+        unique_vault_paths: "{{ servicekeys_map.servicekeys | map(attribute='vault_path') | list | unique }}"
 
-    - name: Ler conteúdo dos segredos para teste
-      delegate_to: "{{ remote_host }}"
-      become: false
-      shell: |
-        set -euo pipefail
-        for f in {{ remote_vault_dir }}/*; do
-          [ -f "$f" ] || continue
-          bn=$(basename "$f")
-          printf "==== %s ====\n" "$bn"
-          cat "$f"
-          printf "\n"
-        done
-      args:
-        executable: /bin/bash
-      register: secrets_dump_raw
+    - name: Ler arquivos de vault remotos via SSH
+      ansible.builtin.slurp:
+        src: "{{ remote_vault_dir }}/{{ item }}"
+      loop: "{{ unique_vault_paths }}"
+      register: slurped_vaults
+      ignore_errors: true
+      no_log: true
 
-    - name: Exibir valores lidos (apenas para teste)
-      debug:
-        msg: "{{ secrets_dump_raw.stdout }}"
-
-    - name: Aviso de segurança
-      debug:
-        msg: >-
-          ATENCAO: Esta execução exibe segredos em claro apenas para fins de
-          teste. Remover esta etapa antes de produção.
+    - name: Construir lista JSON dos vaults lidos
+      ansible.builtin.set_fact:
+        remote_vaults_json: |
+          {% set out = [] %}
+          {% for r in slurped_vaults.results %}
+          {%   if (r is defined) and (r.failed is not defined) and ('content' in r) %}
+          {%     set _ = out.append({'vault_path': r.item, 'content_json': (r.content | b64decode | from_yaml | to_json)}) %}
+          {%   endif %}
+          {% endfor %}
+          {{ out }}
+      no_log: true
 
 
