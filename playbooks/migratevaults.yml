@@ -19,6 +19,7 @@
     - name: Get unique vault file paths by environment
       ansible.builtin.set_fact:
         vault_paths: "{{ defs.servicekeys | selectattr('environment', 'equalto', ambiente) | map(attribute='vault_path') | unique | list }}"
+          #vault_paths: "{{ defs.servicekeys | map(attribute='vault_path') | unique }}"
 
     - name: Process each vault file
       ansible.builtin.include_tasks: ../tasks/process_vault_file.yml
