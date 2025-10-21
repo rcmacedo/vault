@@ -13,7 +13,7 @@
 
 - name: Remover todas as keys do Azure Key Vault
   azure.azcollection.azure_rm_keyvaultkey:
-    name: "{{ item.attributes.name }}"
+    key_name: "{{ item.attributes.name }}"
     vault_uri: "https://{{ azure_vault_name }}.vault.azure.net"
     state: absent
   loop: "{{ akv_keys_info.keys }}"
