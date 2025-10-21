@@ -21,7 +21,6 @@
     secret_name: "{{ item }}"
     keyvault_uri: "https://{{ azure_vault_name }}.vault.azure.net"
     state: absent
-    purge_if_need: true
   loop: "{{ akv_secret_names }}"
   delegate_to: localhost
   tags: delete_all_secrets
