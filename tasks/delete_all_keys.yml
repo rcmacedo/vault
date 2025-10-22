@@ -24,4 +24,6 @@
   loop: "{{ akv_secret_names }}"
   delegate_to: localhost
   tags: delete_all_secrets
-  when: vault_secrets.secrets is defined and vault_secrets.secrets | length > 0
+  when: 
+    - vault_secrets.secrets is defined and vault_secrets.secrets | length > 0
+    - "'delete_all_secrets' in ansible_run_tags"
