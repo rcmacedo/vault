@@ -37,5 +37,5 @@
     loop_var: entry
     pause: 1
   delegate_to: localhost
-  no_log: true
+  #no_log: true
 
