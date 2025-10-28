@@ -37,16 +37,9 @@
             list
           }}
 
-    - name: Display vault paths validation summary
+    - name: Show missing vault paths
       ansible.builtin.debug:
-        msg:
-          - "Total unique vault paths found: {{ vault_paths | length }}"
-          - "Existing vault paths: {{ existing_vault_paths | length }}"
-          - "Missing vault paths: {{ vault_paths | difference(existing_vault_paths) | length }}"
-
-    - name: Show missing vault paths (if any)
-      ansible.builtin.debug:
-        msg: "Missing vault paths: {{ vault_paths | difference(existing_vault_paths) }}"
+        msg: "Missing vault files: {{ vault_paths | difference(existing_vault_paths) }}"
       when: (vault_paths | difference(existing_vault_paths) | length) > 0
 
     - name: Process each vault file
