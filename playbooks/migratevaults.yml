@@ -1,6 +1,6 @@
 ---
 - name: Map vault_key → akv_secret_key ( Migration to Azure KeyVault )
-  hosts: 192.168.124.100
+  hosts: 192.168.122.100
   gather_facts: false
   become: false
 
