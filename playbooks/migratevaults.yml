@@ -19,11 +19,42 @@
       ansible.builtin.set_fact:
         vault_paths: "{{ defs.servicekeys | selectattr('environment', 'equalto', ambiente) | selectattr('secret_type', 'equalto', s_type) | map(attribute='vault_path') | unique | list }}"
 
-    - name: Process each vault file
-      ansible.builtin.include_tasks: ../tasks/process_vault_file.yml
+    - name: Check which vault paths exist on remote host
+      ansible.builtin.stat:
+        path: "{{ base_secret_path }}/{{ item }}"
+      register: vault_path_stats
       loop: "{{ vault_paths }}"
       loop_control:
+        label: "{{ item }}"
+
+    - name: Filter only existing vault paths
+      ansible.builtin.set_fact:
+        existing_vault_paths: >-
+          {{
+            vault_path_stats.results |
+            selectattr('stat.exists', 'equalto', true) |
+            map(attribute='item') |
+            list
+          }}
+
+    - name: Display vault paths validation summary
+      ansible.builtin.debug:
+        msg:
+          - "Total unique vault paths found: {{ vault_paths | length }}"
+          - "Existing vault paths: {{ existing_vault_paths | length }}"
+          - "Missing vault paths: {{ vault_paths | difference(existing_vault_paths) | length }}"
+
+    - name: Show missing vault paths (if any)
+      ansible.builtin.debug:
+        msg: "Missing vault paths: {{ vault_paths | difference(existing_vault_paths) }}"
+      when: (vault_paths | difference(existing_vault_paths) | length) > 0
+
+    - name: Process each vault file
+      ansible.builtin.include_tasks: ../tasks/process_vault_file.yml
+      loop: "{{ existing_vault_paths }}"
+      loop_control:
         loop_var: vault_path
+      when: existing_vault_paths | length > 0
 
     - name: Delete all keys in Azure Key Vault
       ansible.builtin.include_tasks: ../tasks/delete_all_keys.yml
