@@ -4,17 +4,20 @@
   register: vault_secrets
   delegate_to: localhost
   tags: delete_all_secrets
+  no_log: true
 
 - name: List akv_keys_info
   ansible.builtin.debug:
     var: vault_secrets
   delegate_to: localhost
   tags: delete_all_secrets
+  no_log: true
 
 - name: Extract secret names from sid
   set_fact:
     akv_secret_names: "{{ vault_secrets.secrets | map('regex_replace', '.*/secrets/([^/]+)/.*', '\\1') | list }}"
   tags: delete_all_secrets
+  no_log: true
 
 - name: Remover todas as keys do Azure Key Vault
   azure.azcollection.azure_rm_keyvaultsecret:
@@ -27,3 +30,4 @@
   when: 
     - vault_secrets.secrets is defined and vault_secrets.secrets | length > 0
     - "'delete_all_secrets' in ansible_run_tags"
+  no_log: true
