@@ -10,6 +10,7 @@
     var: vault_secrets
   delegate_to: localhost
   tags: delete_all_secrets
+  no_log: true
 
 - name: Extract secret names from sid
   set_fact:
