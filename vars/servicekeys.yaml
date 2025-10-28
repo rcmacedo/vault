@@ -2942,28 +2942,28 @@ servicekeys:
   vault_path: k8s-common/secret_tu.yaml
 
 - microservice: next-central-core
-  secret_type: application_secret
+  secret_type: common_secret
   vault_key: B_REDIS_PASSWORD
   akv_secret_key: AKV-SECRET-KEY-REDIS-001
   environment: pr
   vault_path: k8s-common/secret_pr.yaml
 
 - microservice: next-central-core
-  secret_type: application_secret
+  secret_type: common_secret
   vault_key: B_REDIS_PASSWORD
   akv_secret_key: AKV-SECRET-KEY-REDIS-001
   environment: th
   vault_path: k8s-common/secret_th.yaml
 
 - microservice: next-central-core
-  secret_type: application_secret
+  secret_type: common_secret
   vault_key: B_REDIS_PASSWORD
   akv_secret_key: AKV-SECRET-KEY-REDIS-001
   environment: ti
   vault_path: k8s-common/secret_ti.yaml
 
 - microservice: next-central-core
-  secret_type: application_secret
+  secret_type: common_secret
   vault_key: B_REDIS_PASSWORD
   akv_secret_key: AKV-SECRET-KEY-REDIS-001
   environment: tu
@@ -12217,28 +12217,28 @@ servicekeys:
   vault_path: next-ob-consent/secret_tu.yaml
 
 - microservice: next-ob-consent
-  secret_type: application_secret
+  secret_type: common_secret
   vault_key: B_REDIS_CLUSTER_PASSWORD
   akv_secret_key: AKV-SECRET-KEY-REDIS-001
   environment: ti
   vault_path: k8s-common/secret_ti.yaml
 
 - microservice: next-ob-consent
-  secret_type: application_secret
+  secret_type: common_secret
   vault_key: B_REDIS_CLUSTER_PASSWORD
   akv_secret_key: AKV-SECRET-KEY-REDIS-004
   environment: tu
   vault_path: k8s-common/secret_tu.yaml
 
 - microservice: next-ob-consent
-  secret_type: application_secret
+  secret_type: common_secret
   vault_key: B_REDIS_CLUSTER_PASSWORD
   akv_secret_key: AKV-SECRET-KEY-REDIS-001
   environment: ti
   vault_path: k8s-common-contingency/secret_ti.yaml
 
 - microservice: next-ob-consent
-  secret_type: application_secret
+  secret_type: common_secret
   vault_key: B_REDIS_CLUSTER_PASSWORD
   akv_secret_key: AKV-SECRET-KEY-REDIS-004
   environment: tu
