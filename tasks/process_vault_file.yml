@@ -7,19 +7,10 @@
     full_secret_path: "{{ base_secret_path }}/{{ vault_path }}"
 
 - name: Fetch vault file to controller
-  block:
-
-    - name: Getting the File
-      ansible.builtin.fetch:
-        src: "{{ full_secret_path }}"
-        dest: "/tmp/fetched_{{ vault_path | basename }}"
-        flat: yes
-
-  rescue:
-
-    - name: Vault file is missing
-      ansible.builtin.debug:
-        msg: "Vault file missing: {{ full_secret_path }}"
+  ansible.builtin.fetch:
+    src: "{{ full_secret_path }}"
+    dest: "/tmp/fetched_{{ vault_path | basename }}"
+    flat: yes
 
 - name: Include secret vars from fetched vault
   ansible.builtin.include_vars:
@@ -37,5 +28,5 @@
     loop_var: entry
     pause: 1
   delegate_to: localhost
-  #no_log: true
+  no_log: true
 
